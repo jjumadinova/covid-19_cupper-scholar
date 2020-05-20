@@ -3,22 +3,23 @@ import glob
 import os
 import nltk
 import re
+import heapq
+
+# needs to be run only once
 #nltk.download('stopwords')
 
 def summary_generator():
+    # represent the data from metadata file in pandas dataframe
     meta_df = pd.read_csv('metadata.csv', dtype={
         'pubmed_id': str,
         'Microsoft Academic Paper ID': str,
         'doi': str
     },low_memory = False)
 
-    meta_df.head()
+    # display available coloumns that have information about the article
     meta_df.info()
 
-
-
-    print(type(meta_df['abstract'][1]))
-
+    # Check if the abstract of the article is string data type
     filtered = []
     for i in meta_df['abstract']:
         if isinstance(i, str):
@@ -26,6 +27,7 @@ def summary_generator():
 
     s = ' '.join(filtered)
 
+    # Filter the data from extra symbols
     article_text = re.sub(r'\[[0-9]*\]', ' ', s)
     article_text = re.sub(r'\s+', ' ', s)
 
@@ -36,20 +38,24 @@ def summary_generator():
 
     stopwords = nltk.corpus.stopwords.words('english')
 
+    # Find the frequencies of the words
     word_frequencies = {}
     for word in nltk.word_tokenize(formatted_article_text):
         if word not in stopwords:
+            # make sure that the word is not stopword
             if word not in word_frequencies.keys():
                 word_frequencies[word] = 1
             else:
                 word_frequencies[word] += 1
 
+    # compute the weighted frequencies.
     maximum_frequncy = max(word_frequencies.values())
 
     for word in word_frequencies.keys():
         word_frequencies[word] = (word_frequencies[word]/maximum_frequncy)
 
-
+    # Find the sentence scores for sentences that have less then 30 words. This
+    # value can be modified based on the personal preference.
     sentence_scores = {}
     for sent in sentence_list:
         for word in nltk.word_tokenize(sent.lower()):
@@ -60,7 +66,8 @@ def summary_generator():
                     else:
                         sentence_scores[sent] += word_frequencies[word]
 
-    import heapq
+
+    # retrieve 150 sentences with the highest scores.
     summary_sentences = heapq.nlargest(150, sentence_scores, key=sentence_scores.get)
 
     summary = ' '.join(summary_sentences)
@@ -81,3 +88,7 @@ def summary_generator():
         file_object.write(summary)
         # Close the file
         file_object.close()
+
+# Needs to be called only once to generate the summary of the text, and save it in the
+# specified file
+#summary_generator()
