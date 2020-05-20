@@ -9,7 +9,8 @@ import heapq
 #nltk.download('stopwords')
 
 def summary_generator():
-    # represent the data from metadata file in pandas dataframe
+    # represent the data from metadata file in pandas dataframe. metadata file
+    # is from the Kaggle data set on Covid-19. It has relevant article informations.
     meta_df = pd.read_csv('metadata.csv', dtype={
         'pubmed_id': str,
         'Microsoft Academic Paper ID': str,
@@ -17,9 +18,10 @@ def summary_generator():
     },low_memory = False)
 
     # display available coloumns that have information about the article
+    print("info on metadata file\n")
     meta_df.info()
 
-    # Check if the abstract of the article is string data type
+    # Check if the retrieve abstracts of the articles and check if it is string data type
     filtered = []
     for i in meta_df['abstract']:
         if isinstance(i, str):
@@ -27,16 +29,13 @@ def summary_generator():
 
     s = ' '.join(filtered)
 
-    with open('summary.txt', 'r') as file:
-        s = file.read()
-
-
     # Filter the data from extra symbols
     text = re.sub(r'\[[0-9]*\]', ' ', s)
     text = re.sub(r'\s+', ' ', s)
 
     formated_text = re.sub('[^a-zA-Z]', ' ',text )
     formated_text = re.sub(r'\s+', ' ', formated_text)
+
 
     sentence_list = nltk.sent_tokenize(s)
 
@@ -69,10 +68,11 @@ def summary_generator():
 
 
     # retrieve 150 sentences with the highest scores.
-    summary_sentences = heapq.nlargest(150, sentence_scores, key=sentence_scores.get)
+    # NOTE: this value is hard coded and can be modifed depending on how large the summary needs to be
+    summary_sentences = heapq.nlargest(10, sentence_scores, key=sentence_scores.get)
 
     summary = ' '.join(summary_sentences)
-    print(summary)
+    print('\nWhat do we know on Corona virus?\n',summary,)
 
 
     def is_empty(path):
@@ -92,4 +92,4 @@ def summary_generator():
 
 # Needs to be called only once to generate the summary of the text, and save it in the
 # specified file
-#summary_generator()
+summary_generator()
