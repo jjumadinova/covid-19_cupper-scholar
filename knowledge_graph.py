@@ -1,17 +1,25 @@
 from pycorenlp import StanfordCoreNLP
 
+with open('summary.txt', 'r') as file:
+    data = file.read()
+
 nlp = StanfordCoreNLP("http://localhost:9000/")
 
-text = 'Mark Robert is the founder of 3trucks. 3trucks was founded in 2010'
-
-output = nlp.annotate(text, properties={"annotators":"tokenize,ssplit,pos,depparse,natlog,openie",
+output = nlp.annotate(data, properties={"annotators":"tokenize,ssplit,pos,depparse,natlog,openie",
                             "outputFormat": "json",
                              "openie.triple.strict":"true",
                              "openie.max_entailments_per_clause":"1"})
 
+result = []
+for i in output["sentences"]:
+    result.append([i["openie"] for item in output])
 
-result = [output["sentences"][0]["openie"] for item in output]
-for i in result:
-    for rel in i:
-        relationSent=rel['subject'],rel['relation'],rel['object']
-        print(relationSent)
+
+def triple(result):
+    for i in result:
+        for n in i:
+            for rel in n:
+                relationSent=rel['subject'],rel['relation'],rel['object']
+                print(relationSent)
+
+triple(result)
