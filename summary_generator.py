@@ -69,7 +69,7 @@ def summary_generator():
 
     # retrieve 150 sentences with the highest scores.
     # NOTE: this value is hard coded and can be modifed depending on how large the summary needs to be
-    summary_sentences = heapq.nlargest(10, sentence_scores, key=sentence_scores.get)
+    summary_sentences = heapq.nlargest(150, sentence_scores, key=sentence_scores.get)
 
     summary = ' '.join(summary_sentences)
     print('\nWhat do we know on Corona virus?\n',summary,)
@@ -92,4 +92,4 @@ def summary_generator():
 
 # Needs to be called only once to generate the summary of the text, and save it in the
 # specified file
-summary_generator()
+#summary_generator()

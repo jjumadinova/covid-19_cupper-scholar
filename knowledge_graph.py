@@ -1,25 +1,17 @@
-from pycorenlp import StanfordCoreNLP
+import json
+import networkx as nx
+import pandas as pd
+import matplotlib.pyplot as plt
 
-with open('summary.txt', 'r') as file:
-    data = file.read()
-
-nlp = StanfordCoreNLP("http://localhost:9000/")
-
-output = nlp.annotate(data, properties={"annotators":"tokenize,ssplit,pos,depparse,natlog,openie",
-                            "outputFormat": "json",
-                             "openie.triple.strict":"true",
-                             "openie.max_entailments_per_clause":"1"})
-
-result = []
-for i in output["sentences"]:
-    result.append([i["openie"] for item in output])
+print(pd.Series(relation).value_counts()[:50])
 
 
-def triple(result):
-    for i in result:
-        for n in i:
-            for rel in n:
-                relationSent=rel['subject'],rel['relation'],rel['object']
-                print(relationSent)
+kg_df = pd.DataFrame({'source':subject, 'target':object, 'edge':relation})
 
-triple(result)
+G=nx.from_pandas_edgelist(kg_df[kg_df['edge']=="is in"], "source", "target",
+                          edge_attr=True, create_using=nx.MultiDiGraph())
+
+plt.figure(figsize=(16,16))
+pos = nx.spring_layout(G, k = 1) # k regulates the distance between nodes
+nx.draw(G, with_labels=True, node_color='skyblue', node_size=1500, edge_cmap=plt.cm.Blues, pos = pos)
+plt.show()
