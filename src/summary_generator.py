@@ -11,7 +11,7 @@ import heapq
 def summary_generator():
     # represent the data from metadata file in pandas dataframe. metadata file
     # is from the Kaggle data set on Covid-19. It has relevant article informations.
-    meta_df = pd.read_csv('metadata.csv', dtype={
+    meta_df = pd.read_csv('../data/metadata.csv', dtype={
         'pubmed_id': str,
         'Microsoft Academic Paper ID': str,
         'doi': str
@@ -80,11 +80,11 @@ def summary_generator():
         return os.path.exists(path) and os.stat(path).st_size == 0
 
 
-    empty = is_empty('summary.txt')
+    empty = is_empty('../data/summary.txt')
 
     if empty:
         # Open a file, if the file does not exist with mode `a` new one will be created
-        file_object = open('summary.txt', 'a')
+        file_object = open('../data/summary.txt', 'a')
         # add the generated string to the file, input is the file with subtitles
         file_object.write(summary)
         # Close the file
