@@ -1,6 +1,6 @@
 from pycorenlp import StanfordCoreNLP
 
-with open('summary.txt', 'r') as file:
+with open('../data/summary.txt', 'r') as file:
     data = file.read()
 
 nlp = StanfordCoreNLP("http://localhost:9000/")
