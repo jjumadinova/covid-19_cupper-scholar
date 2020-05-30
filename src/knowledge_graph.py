@@ -12,13 +12,15 @@ subject = (data["subject"])
 object = (data["object"])
 relation = (data["relation"])
 
-
-print(pd.Series(relation).value_counts()[:50])
+print("Top 10 relations:")
+print(pd.Series(relation).value_counts()[:10])
 
 
 kg_df = pd.DataFrame({'source':subject, 'target':object, 'edge':relation})
 
-G=nx.from_pandas_edgelist(kg_df[kg_df['edge']=="is with"], "source", "target",
+relation = input("\nPlease enter one of the relations listed above\n")
+
+G=nx.from_pandas_edgelist(kg_df[kg_df['edge']==relation], "source", "target",
                           edge_attr=True, create_using=nx.MultiDiGraph())
 
 plt.figure(figsize=(16,16))

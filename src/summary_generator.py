@@ -8,88 +8,85 @@ import heapq
 # needs to be run only once
 #nltk.download('stopwords')
 
-def summary_generator():
-    # represent the data from metadata file in pandas dataframe. metadata file
-    # is from the Kaggle data set on Covid-19. It has relevant article informations.
-    meta_df = pd.read_csv('../data/metadata.csv', dtype={
-        'pubmed_id': str,
-        'Microsoft Academic Paper ID': str,
-        'doi': str
-    },low_memory = False)
 
-    # display available coloumns that have information about the article
-    print("info on metadata file\n")
-    meta_df.info()
+# represent the data from metadata file in pandas dataframe. metadata file
+# is from the Kaggle data set on Covid-19. It has relevant article informations.
+meta_df = pd.read_csv('../data/metadata.csv', dtype={
+    'pubmed_id': str,
+    'Microsoft Academic Paper ID': str,
+    'doi': str
+},low_memory = False)
 
-    # Check if the retrieve abstracts of the articles and check if it is string data type
-    filtered = []
-    for i in meta_df['abstract']:
-        if isinstance(i, str):
-            filtered.append(i)
+# display available coloumns that have information about the article
+print("info on metadata file\n")
+meta_df.info()
 
-    s = ' '.join(filtered)
+# Check if the retrieve abstracts of the articles and check if it is string data type
+filtered = []
+for i in meta_df['abstract']:
+    if isinstance(i, str):
+        filtered.append(i)
 
-    # Filter the data from extra symbols
-    text = re.sub(r'\[[0-9]*\]', ' ', s)
-    text = re.sub(r'\s+', ' ', s)
+s = ' '.join(filtered)
 
-    formated_text = re.sub('[^a-zA-Z]', ' ',text )
-    formated_text = re.sub(r'\s+', ' ', formated_text)
+# Filter the data from extra symbols
+text = re.sub(r'\[[0-9]*\]', ' ', s)
+text = re.sub(r'\s+', ' ', s)
+
+formated_text = re.sub('[^a-zA-Z]', ' ',text )
+formated_text = re.sub(r'\s+', ' ', formated_text)
 
 
-    sentence_list = nltk.sent_tokenize(s)
+sentence_list = nltk.sent_tokenize(s)
 
-    stopwords = nltk.corpus.stopwords.words('english')
+stopwords = nltk.corpus.stopwords.words('english')
 
-    # Find the frequencies of the words
-    word_freqs = {}
-    for word in nltk.word_tokenize(formated_text):
-        if word not in stopwords:
-            # make sure that the word is not stopword
-            if word not in word_freqs.keys():
-                word_freqs[word] = 1
+tokenized = nltk.word_tokenize(formated_text)
+# Find the frequencies of the words
+word_freqs = {}
+for word in tokenized:
+    if word not in stopwords:
+        # make sure that the word is not stopword
+        if word not in word_freqs.keys():
+            word_freqs[word] = 1
+        else:
+            word_freqs[word] += 1
+
+# compute the weighted frequencies, by dividing the frequencies of the words
+# by the word that has highest frequency
+for word in word_freqs.keys():
+    word_freqs[word] = (word_freqs[word]/max(word_freqs.values()))
+
+# Find the sentence scores by adding the weighted frequencies of the words in each sentence.
+sentence_scores = {}
+for sent in sentence_list:
+    for word in nltk.word_tokenize(sent.lower()):
+        if word in word_freqs.keys():
+            if sent not in sentence_scores.keys():
+                sentence_scores[sent] = word_freqs[word]
             else:
-                word_freqs[word] += 1
-
-    # compute the weighted frequencies, by dividing the frequencies of the words
-    # by the word that has highest frequency
-    for word in word_freqs.keys():
-        word_freqs[word] = (word_freqs[word]/max(word_freqs.values()))
-
-    # Find the sentence scores by adding the weighted frequencies of the words in each sentence.
-    sentence_scores = {}
-    for sent in sentence_list:
-        for word in nltk.word_tokenize(sent.lower()):
-            if word in word_freqs.keys():
-                if sent not in sentence_scores.keys():
-                    sentence_scores[sent] = word_freqs[word]
-                else:
-                    sentence_scores[sent] += word_freqs[word]
+                sentence_scores[sent] += word_freqs[word]
 
 
-    # retrieve 150 sentences with the highest scores.
-    # NOTE: this value is hard coded and can be modifed depending on how large the summary needs to be
-    summary_sentences = heapq.nlargest(150, sentence_scores, key=sentence_scores.get)
+# retrieve 150 sentences with the highest scores.
+# NOTE: this value is hard coded and can be modifed depending on how large the summary needs to be
+summary_sentences = heapq.nlargest(150, sentence_scores, key=sentence_scores.get)
 
-    summary = ' '.join(summary_sentences)
-    print('\nWhat do we know on Corona virus?\n',summary,)
-
-
-    def is_empty(path):
-        """Check if the path exitst and if file is empty"""
-        return os.path.exists(path) and os.stat(path).st_size == 0
+summary = ' '.join(summary_sentences)
+print('\nWhat do we know on Corona virus?\n',summary,)
 
 
-    empty = is_empty('../data/summary.txt')
+def is_empty(path):
+    """Check if the path exitst and if file is empty"""
+    return os.path.exists(path) and os.stat(path).st_size == 0
 
-    if empty:
-        # Open a file, if the file does not exist with mode `a` new one will be created
-        file_object = open('../data/summary.txt', 'a')
-        # add the generated string to the file, input is the file with subtitles
-        file_object.write(summary)
-        # Close the file
-        file_object.close()
 
-# Needs to be called only once to generate the summary of the text, and save it in the
-# specified file
-#summary_generator()
+empty = is_empty('../data/summary.txt')
+
+if empty:
+    # Open a file, if the file does not exist with mode `a` new one will be created
+    file_object = open('../data/summary.txt', 'a')
+    # add the generated string to the file, input is the file with subtitles
+    file_object.write(summary)
+    # Close the file
+    file_object.close()
