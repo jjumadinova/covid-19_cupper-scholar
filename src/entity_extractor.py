@@ -31,5 +31,5 @@ import json
 lists = ['subject', 'relation', 'object']
 
 data = {listname: globals()[listname] for listname in lists}
-with open('file.json', 'w') as outfile:
+with open('../data/file.json', 'w') as outfile:
     json.dump(data, outfile, indent=4)
