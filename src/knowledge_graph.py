@@ -8,7 +8,7 @@ import collections
 import nltk
 
 
-with open("../data/file.json") as f:
+with open("../data/entity_pairs.json") as f:
   data = json.load(f)
 
 

@@ -7,7 +7,7 @@ import itertools
 
 # Needs to be run only once
 #nltk.download('stopwords')
-
+input_length = input("Please enter the number of sentences for the summary\n")
 
 meta_df = pd.read_csv('../data/metadata.csv', dtype={
     'pubmed_id': str,
@@ -91,7 +91,7 @@ scores = sent_scores(sentence_list, frequencies)
 
 # Take top 150 sentences, this value is hard coded and can be anything depending on
 # how large the summary needs to be.
-summary_sentences = heapq.nlargest(150, scores, key = scores.get)
+summary_sentences = heapq.nlargest(input_length, scores, key = scores.get)
 
 # Find the urls for the top 150 sentences, and store them as dictionary.
 sent_link = {}

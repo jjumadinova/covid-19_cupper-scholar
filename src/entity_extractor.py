@@ -4,9 +4,14 @@ from pycorenlp import StanfordCoreNLP
 import json
 
 
-with open('../data/summary.txt', 'r') as file:
-    data = file.read()
+with open("../data/summary_urls.json") as f:
+    summary = json.load(f)
 
+summary_list = []
+for key,value in summary.items():
+    summary_list.append(key)
+
+data = ''.join(summary_list)
 
 nlp = StanfordCoreNLP("http://localhost:9000/")
 
@@ -38,5 +43,5 @@ lists = ['subject', 'relation', 'object']
 
 
 data = {listname: globals()[listname] for listname in lists}
-with open('../data/file.json', 'w') as outfile:
+with open('../data/entitiy_pairs.json', 'w') as outfile:
     json.dump(data, outfile, indent=4)
