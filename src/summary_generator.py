@@ -89,8 +89,6 @@ def sent_scores(sentences, word_freqs):
 
 scores = sent_scores(sentence_list, frequencies)
 
-# Take top 150 sentences, this value is hard coded and can be anything depending on
-# how large the summary needs to be.
 summary_sentences = heapq.nlargest(input_length, scores, key = scores.get)
 
 # Find the urls for the top 150 sentences, and store them as dictionary.

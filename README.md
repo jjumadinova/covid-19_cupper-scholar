@@ -5,7 +5,7 @@ Repository to hold a research project conducted by Teona Bagashvili as a part of
 ## Necessary tools and libraries
 networkx, pandas, matplotlib, nltk, heapq
 
-The program is tested on Linux machine, with Pyhton 3.7.6 version
+The program is tested on Linux, with Pyhton 3.7.6 version
 
 ## Steps for running the program
 
